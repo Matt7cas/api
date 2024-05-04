@@ -1,4 +1,4 @@
-process.on('uncaughtException', console.error)
+process.on('uncaughtException', console.error);
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -12,30 +12,13 @@ const { execSync } = require('child_process');
 const axios = require('axios');
 const favicon = require('serve-favicon');
 const nodemailer = require("nodemailer");
-const visitors = new Set(); 
+const visitors = new Set();
 let totalRequests = 0;
 let totalVisitors = 0;
 
 var allowedOrigins = ['https://api.cafirexos.com', 'http://localhost:2027'];
 
-app.set('trust proxy', 1)
-
-// Inicicializar el servidor de correo
-
-if (process.env.new_user_verification === "true") {
-const transporter = nodemailer.createTransport({
-  host: process.env.smtp_host,
-  port: Number(process.env.smtp_port),
-  secure: process.env.smtp_is_secure === 'true',
-  auth: {
-    user: process.env.smtp_user,
-    pass: process.env.smtp_password
-  },
-});
-global.mTransporter = transporter;
-}
-
-
+app.set('trust proxy', 1);
 
 // Funciones
 
@@ -56,10 +39,10 @@ const getUptime = () => {
 app.use((req, res, next) => {
   req.startTime = Date.now();
   totalRequests++;
-  const userIp = req.ip; 
+  const userIp = req.ip;
   if (!visitors.has(userIp)) {
-    visitors.add(userIp); 
-    totalVisitors++; 
+    visitors.add(userIp);
+    totalVisitors++;
   }
   next();
 });
@@ -67,25 +50,24 @@ app.use((req, res, next) => {
 app.use('/', home);
 app.use('/docs', docs);
 
-
-app.use('/api', require('./routes'))
+app.use('/api', require('./routes'));
 
 // si es /human/algo usa las rutas dinamicas de ./routes/human
-app.use('/human', require('./routes/human'))
+app.use('/human', require('./routes/human'));
 
-//si es /human entra aqui directamente
+// si es /human entra aqui directamente
 app.use('/human', apirouter5);
 
 app.use('/tmp', express.static('tmp'));
 app.use(express.static('public'));
 app.use(express.static('data'));
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 app.get('/status', (req, res) => {
   const uptime = getUptime();
   const averageResponseTime = Date.now() - req.startTime;
-  totalRequests--; 
+  totalRequests--;
   const response = {
     uptime: uptime,
     latencia: `${averageResponseTime} ms`,
@@ -102,9 +84,9 @@ app.get('/status', (req, res) => {
 app.disable("x-powered-by");
 
 app.use(function(req, res, next) {
-    res.status(404);
-    const filePath = path.join(__dirname, 'public', '404.html');
-    res.sendFile(filePath);
+  res.status(404);
+  const filePath = path.join(__dirname, 'public', '404.html');
+  res.sendFile(filePath);
 });
 
 // Funciones automáticas 
@@ -147,7 +129,7 @@ async function checkRepoUpdates() {
 }
 setInterval(checkRepoUpdates, 300000); //300000
 
-// Log incial 
+// Log inicial 
 app.listen(port, function() {
     const line = chalk.yellow('==========================================');
     const serverUrl = 'http://localhost:' + port;
